@@ -11,7 +11,7 @@ from src.messages import clear_chat, algorithms_list_message, start_page_message
 logger.remove()
 logger.add(stdout, format="{time:YYYY-MM-DD HH:mm:ss} - {level} - {name}: {message}")
 
-bot = TeleBot(os.getenv("TELEGRAM_BOT_TOCKEN"))
+bot = TeleBot(os.getenv("TELEGRAM_BOT_TOKEN"))
 admin_id = int(os.getenv("ADMIN_ID"))
 usolved_algorithms = get_unsolved_algorithms(solved_algorithms=get_solved_algorithms())
 page_options = {"page": -1, "limit": 10, "data": [], "color": ""}

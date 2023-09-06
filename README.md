@@ -7,6 +7,6 @@ The bot allows you to synchronize your assets of solved algorithms on GitHub wit
 ## Environments
 The project can be built using docker via Dockerfile. Need the following envs:
 ```
-TELEGRAM_BOT_TOCKEN=<telegram bot token from @BotFather>
+TELEGRAM_BOT_TOKEN=<telegram bot token from @BotFather>
 ADMIN_ID=<your user telegram id>
 ```
