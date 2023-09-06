@@ -1,0 +1,5 @@
+# python 3.10
+
+pytelegrambotapi==4.13.0
+loguru==0.7.1
+black==23.7.0
