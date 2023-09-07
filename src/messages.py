@@ -40,3 +40,13 @@ def algorithms_list_message(page_options: dict) -> (str, InlineKeyboardMarkup):
     markup.add(btn1, btn2, btn3)
 
     return message, markup
+
+
+def useful_links_list_message() -> str:
+    message = "Useful or commonly used links:\n"
+    links = {"https://euangoddard.github.io/clipboard2markdown/": "HTML to Markdown converter"}
+
+    for link, description in links.items():
+        message += f"[link]({link}) : {description}\n\n"
+
+    return message

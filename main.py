@@ -6,7 +6,7 @@ from telebot import TeleBot
 from loguru import logger
 
 from src.data import get_solved_algorithms, get_unsolved_algorithms
-from src.messages import clear_chat, algorithms_list_message, start_page_message
+from src.messages import clear_chat, algorithms_list_message, start_page_message, useful_links_list_message
 
 logger.remove()
 logger.add(stdout, format="{time:YYYY-MM-DD HH:mm:ss} - {level} - {name}: {message}")
@@ -44,6 +44,14 @@ def update_algorithms(request):
         bot.delete_message(request.from_user.id, request.message_id + 1)
 
         start_page(request)
+
+
+@bot.message_handler(commands=["links"])
+def start_page(request):
+    if int(request.from_user.id) == admin_id:
+        clear_chat(bot_conn=bot, chat_id=request.chat.id, message_id=request.message_id)
+        message = useful_links_list_message()
+        bot.send_message(request.from_user.id, message, parse_mode="Markdown", disable_web_page_preview=True)
 
 
 @bot.callback_query_handler(func=lambda call: True)
