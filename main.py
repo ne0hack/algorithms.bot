@@ -47,7 +47,7 @@ def update_algorithms(request):
 
 
 @bot.message_handler(commands=["links"])
-def start_page(request):
+def links_page(request):
     if int(request.from_user.id) == admin_id:
         clear_chat(bot_conn=bot, chat_id=request.chat.id, message_id=request.message_id)
         message = useful_links_list_message()

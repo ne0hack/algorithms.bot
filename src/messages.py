@@ -26,12 +26,9 @@ def start_page_message() -> (str, InlineKeyboardMarkup):
 
 def algorithms_list_message(page_options: dict) -> (str, InlineKeyboardMarkup):
     """Returns the generated list of algorithms in Markdown format"""
-    message = ""
+    message = "Unsolved algorithms:\n"
     for alogrithm in page_options["data"][page_options["page"] - 1]:
-        message += page_options["color"] + " [" + alogrithm["title"][:31].strip()
-        if len(alogrithm["title"]) >= 31:
-            message += "..."
-        message += "]" + "(" + alogrithm["link"] + ")\n\n"
+        message += page_options["color"] + " [" + alogrithm["title"].strip() + "]" + "(" + alogrithm["link"] + ")\n\n"
 
     markup = InlineKeyboardMarkup()
     btn1 = InlineKeyboardButton(text="◀️", callback_data="prev_page")
