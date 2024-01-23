@@ -14,7 +14,7 @@ def get_solved_algorithms() -> List[str]:
         data = response.json()
         for file in data["tree"]:
             if "leetcode/" in file["path"] and ".md" in file["path"]:
-                title = file["path"].replace("leetcode/", "").replace(".md", "").strip()
+                title = " ".join(file["path"].replace("leetcode/", "").replace(".md", "").strip().split())
                 solved.append(title)
 
     return solved
@@ -31,7 +31,13 @@ def get_unsolved_algorithms(solved_algorithms: List[str]) -> Dict[str, list]:
         data = response.json()
         for algorithm in data["stat_status_pairs"]:
             if not algorithm["paid_only"]:
-                title = str(algorithm["stat"]["frontend_question_id"]) + ". " + algorithm["stat"]["question__title"].strip()
+                title = " ".join(
+                    (
+                        str(algorithm["stat"]["frontend_question_id"])
+                        + ". "
+                        + algorithm["stat"]["question__title"].strip()
+                    ).split()
+                )
                 status = status_codes[int(algorithm["difficulty"]["level"])]
                 link = "https://leetcode.com/problems/" + algorithm["stat"]["question__title_slug"].strip()
 
