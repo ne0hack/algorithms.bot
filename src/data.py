@@ -1,17 +1,31 @@
 from typing import List, Dict
-
-import requests
+from urllib.parse import urlencode
+import http.client
+import json
 
 
 def get_solved_algorithms() -> List[str]:
+    """
+    Fetches a list of solved algorithm problems from a specific GitHub repository.
+
+    Returns:
+        List[str]: A list of titles representing solved algorithm problems.
+    """
+
     solved = []
-    url = "https://api.github.com/repos/ne0hack/algos/git/trees/main"
+
+    conn = http.client.HTTPSConnection("api.github.com")
+
+    headers = {"Accept": "*/*", "User-Agent": "Mozilla/5.0"}
+    payload = ""
     params = {"recursive": 1}
+    params_string = urlencode(params)
 
-    response = requests.get(url=url, params=params)
+    conn.request("GET", "/repos/ne0hack/algos/git/trees/main?" + params_string, payload, headers)
+    response = conn.getresponse()
 
-    if response.status_code == 200:
-        data = response.json()
+    if response.status == 200:
+        data = json.loads(response.read().decode("utf-8"))
         for file in data["tree"]:
             if "leetcode/" in file["path"] and ".md" in file["path"]:
                 title = " ".join(file["path"].replace("leetcode/", "").replace(".md", "").strip().split())
@@ -21,14 +35,32 @@ def get_solved_algorithms() -> List[str]:
 
 
 def get_unsolved_algorithms(solved_algorithms: List[str]) -> Dict[str, list]:
+    """
+    Fetches unsolved algorithm problems from LeetCode and categorizes them by difficulty.
+
+    Parameters:
+    - solved_algorithms (List[str]): A list of titles of algorithm
+      problems that have already been solved.
+
+    Returns:
+    - Dict[str, list]: A dictionary with keys 'easy', 'medium', and 'hard'. Each key maps to
+      a list of dictionaries, where each dictionary represents an unsolved problem
+      with 'title' and 'link' keys.
+    """
+
     status_codes = {1: "easy", 2: "medium", 3: "hard"}
     unsolved = {"easy": [], "medium": [], "hard": []}
-    url = "https://leetcode.com/api/problems/all/"
 
-    response = requests.get(url=url)
+    conn = http.client.HTTPSConnection("leetcode.com")
 
-    if response.status_code == 200:
-        data = response.json()
+    headers = {"Accept": "*/*", "User-Agent": "Mozilla/5.0"}
+    payload = ""
+
+    conn.request("GET", "/api/problems/all/", payload, headers)
+    response = conn.getresponse()
+
+    if response.status == 200:
+        data = json.loads(response.read().decode("utf-8"))
         for algorithm in data["stat_status_pairs"]:
             if not algorithm["paid_only"]:
                 title = " ".join(
