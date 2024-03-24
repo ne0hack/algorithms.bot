@@ -3,4 +3,5 @@
 pytelegrambotapi==4.13.0
 loguru==0.7.1
 fake-useragent==1.5.1
+playwright==1.42.0
 black==23.7.0
