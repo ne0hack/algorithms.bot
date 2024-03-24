@@ -10,8 +10,12 @@ COPY app/ app/
 
 # Install dependency
 RUN apt-get update
+
 RUN pip install --upgrade pip
 RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
+
+RUN playwright install-deps 
+RUN playwright install
 
 # Run app
 ENTRYPOINT ["python3", "main.py"]

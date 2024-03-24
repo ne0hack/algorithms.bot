@@ -1,7 +1,9 @@
 from typing import List, Dict
+import json
 
 import requests
 from fake_useragent import UserAgent
+from playwright.sync_api import sync_playwright
 
 
 def get_solved_algorithms() -> List[str]:
@@ -54,30 +56,41 @@ def get_unsolved_algorithms(solved_algorithms: List[str]) -> Dict[str, list]:
     headers = {"Accept": "*/*", "User-Agent": user_agent.random}
     timeout_seconds = 10
 
-    response = requests.get(url=url, headers=headers, timeout=timeout_seconds)
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.set_extra_http_headers(headers)
 
-    if response.status_code == 200:
-        data = response.json()
-        for algorithm in data["stat_status_pairs"]:
-            if not algorithm["paid_only"]:
-                title = " ".join(
-                    (
-                        str(algorithm["stat"]["frontend_question_id"])
-                        + ". "
-                        + algorithm["stat"]["question__title"].strip()
-                    ).split()
-                )
-                status = status_codes[int(algorithm["difficulty"]["level"])]
-                link = "https://leetcode.com/problems/" + algorithm["stat"]["question__title_slug"].strip()
+        response = page.goto(url, timeout=timeout_seconds * 1000)
 
-                if title not in solved_algorithms:
-                    unsolved[status].append({"title": title, "link": link})
-        unsolved["easy"] = unsolved["easy"][::-1]
-        unsolved["medium"] = unsolved["medium"][::-1]
-        unsolved["hard"] = unsolved["hard"][::-1]
-    elif response.status_code == 403:
-        raise PermissionError("Access to the resource is forbidden. (HTTP code: 403)")
-    else:
-        raise UserWarning(f"An unknown leetcode.com code arrived. (HTTP code: {response.status_code})")
+        if response.status == 200:
+            data = json.loads(response.text())
+
+            for algorithm in data["stat_status_pairs"]:
+                if not algorithm["paid_only"]:
+                    title = " ".join(
+                        (
+                            str(algorithm["stat"]["frontend_question_id"])
+                            + ". "
+                            + algorithm["stat"]["question__title"].strip()
+                        ).split()
+                    )
+                    status = status_codes[int(algorithm["difficulty"]["level"])]
+                    link = "https://leetcode.com/problems/" + algorithm["stat"]["question__title_slug"].strip()
+
+                    if title not in solved_algorithms:
+                        unsolved[status].append({"title": title, "link": link})
+
+            unsolved["easy"] = unsolved["easy"][::-1]
+            unsolved["medium"] = unsolved["medium"][::-1]
+            unsolved["hard"] = unsolved["hard"][::-1]
+
+            browser.close()
+        elif response.status == 403:
+            browser.close()
+            raise PermissionError("Access to the resource is forbidden. (HTTP code: 403)")
+        else:
+            browser.close()
+            raise UserWarning(f"An unknown leetcode.com code arrived. (HTTP code: {response.status})")
 
     return unsolved
