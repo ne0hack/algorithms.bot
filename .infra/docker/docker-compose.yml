@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  bot:
+    build: 
+      context: ../../
+      dockerfile: .infra/docker/Dockerfile
+    container_name: algosbot
+    restart: always
+    env_file:
+      - ../../.env

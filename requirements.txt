@@ -1,5 +1,6 @@
 # python 3.10
 
+python-environ==0.4.54
 pytelegrambotapi==4.13.0
 loguru==0.7.1
 fake-useragent==1.5.1
