@@ -1,18 +1,10 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from telebot.apihelper import ApiTelegramException
-
-
-def clear_chat(bot_conn, chat_id: int, message_id: int, num_mes_clear: int = 4) -> None:
-    """Clears previous messages up to `num_mes_clear`"""
-    for shift in range(num_mes_clear):
-        try:
-            bot_conn.delete_message(chat_id, message_id - shift)
-        except ApiTelegramException:
-            pass
 
 
 def start_page_message() -> (str, InlineKeyboardMarkup):
-    """Forms the start menu of the message"""
+    """
+    Forms the start menu of the message
+    """
     message = "Choose the level of complexity of the algorithms:"
 
     markup = InlineKeyboardMarkup()
@@ -25,14 +17,16 @@ def start_page_message() -> (str, InlineKeyboardMarkup):
 
 
 def algorithms_list_message(page_options: dict) -> (str, InlineKeyboardMarkup):
-    """Returns the generated list of algorithms in Markdown format"""
+    """
+    Returns the generated list of algorithms in Markdown format
+    """
     if not page_options["data"]:
         message = "All algorithms of this level have been solved! 🎉"
         return message, None
 
     message = "Unsolved algorithms:\n"
-    for alogrithm in page_options["data"][page_options["page"] - 1]:
-        message += page_options["color"] + " [" + alogrithm["title"].strip() + "]" + "(" + alogrithm["link"] + ")\n\n"
+    for algorithm in page_options["data"][page_options["page"] - 1]:
+        message += page_options["color"] + " [" + algorithm["title"].strip() + "]" + "(" + algorithm["link"] + ")\n\n"
 
     markup = InlineKeyboardMarkup()
     btn1 = InlineKeyboardButton(text="◀️", callback_data="prev_page")
@@ -44,10 +38,19 @@ def algorithms_list_message(page_options: dict) -> (str, InlineKeyboardMarkup):
 
 
 def useful_links_list_message() -> str:
-    message = "Useful or commonly used links:\n"
-    links = {"https://euangoddard.github.io/clipboard2markdown/": "HTML to Markdown converter"}
+    """
+    Returns a string containing a list of useful or commonly used links.
+    """
+    message = "Useful or commonly used links:\n\n"
+    links = {
+        "https://euangoddard.github.io/clipboard2markdown/": "HTML to Markdown converter",
+        "https://leetcode.com/": "online platform for coding interview preparation",
+        "https://coderun.yandex.ru/": "online platform where users can solve coding problems",
+        "https://www.codewars.com/": "educational community for computer programming",
+        "https://www.hackerrank.com/": "tech hiring platform serves as the standard for assessing developer skills",
+    }
 
     for link, description in links.items():
-        message += f"[link]({link}) : {description}\n\n"
+        message += f" - [link]({link}) : {description}\n\n"
 
     return message

@@ -1,7 +1,7 @@
 from typing import List, Dict
-from urllib.parse import urlencode
-import http.client
-import json
+
+import requests
+from fake_useragent import UserAgent
 
 
 def get_solved_algorithms() -> List[str]:
@@ -11,25 +11,24 @@ def get_solved_algorithms() -> List[str]:
     Returns:
         List[str]: A list of titles representing solved algorithm problems.
     """
-
     solved = []
 
-    conn = http.client.HTTPSConnection("api.github.com")
-
-    headers = {"Accept": "*/*", "User-Agent": "Mozilla/5.0"}
-    payload = ""
+    url = "https://api.github.com/repos/ne0hack/algos/git/trees/main"
+    user_agent = UserAgent()
+    headers = {"Accept": "*/*", "User-Agent": user_agent.random}
     params = {"recursive": 1}
-    params_string = urlencode(params)
+    timeout_seconds = 10
 
-    conn.request("GET", "/repos/ne0hack/algos/git/trees/main?" + params_string, payload, headers)
-    response = conn.getresponse()
+    response = requests.get(url=url, params=params, headers=headers, timeout=timeout_seconds)
 
-    if response.status == 200:
-        data = json.loads(response.read().decode("utf-8"))
+    if response.status_code == 200:
+        data = response.json()
         for file in data["tree"]:
             if "leetcode/" in file["path"] and ".md" in file["path"]:
                 title = " ".join(file["path"].replace("leetcode/", "").replace(".md", "").strip().split())
                 solved.append(title)
+    else:
+        raise UserWarning(f"An unknown github.com code arrived. (HTTP code: {response.status_code})")
 
     return solved
 
@@ -47,20 +46,18 @@ def get_unsolved_algorithms(solved_algorithms: List[str]) -> Dict[str, list]:
       a list of dictionaries, where each dictionary represents an unsolved problem
       with 'title' and 'link' keys.
     """
-
     status_codes = {1: "easy", 2: "medium", 3: "hard"}
     unsolved = {"easy": [], "medium": [], "hard": []}
 
-    conn = http.client.HTTPSConnection("leetcode.com")
+    url = "https://leetcode.com/api/problems/all/"
+    user_agent = UserAgent()
+    headers = {"Accept": "*/*", "User-Agent": user_agent.random}
+    timeout_seconds = 10
 
-    headers = {"Accept": "*/*", "User-Agent": "Mozilla/5.0"}
-    payload = ""
+    response = requests.get(url=url, headers=headers, timeout=timeout_seconds)
 
-    conn.request("GET", "/api/problems/all/", payload, headers)
-    response = conn.getresponse()
-
-    if response.status == 200:
-        data = json.loads(response.read().decode("utf-8"))
+    if response.status_code == 200:
+        data = response.json()
         for algorithm in data["stat_status_pairs"]:
             if not algorithm["paid_only"]:
                 title = " ".join(
@@ -78,5 +75,9 @@ def get_unsolved_algorithms(solved_algorithms: List[str]) -> Dict[str, list]:
         unsolved["easy"] = unsolved["easy"][::-1]
         unsolved["medium"] = unsolved["medium"][::-1]
         unsolved["hard"] = unsolved["hard"][::-1]
+    elif response.status_code == 403:
+        raise PermissionError("Access to the resource is forbidden. (HTTP code: 403)")
+    else:
+        raise UserWarning(f"An unknown leetcode.com code arrived. (HTTP code: {response.status_code})")
 
     return unsolved
