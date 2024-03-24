@@ -6,7 +6,7 @@ WORKDIR /algosbot
 # Copying the dependency file and the program code to the working directory
 COPY requirements.txt .
 COPY main.py .
-COPY src/ src/
+COPY app/ app/
 
 # Install dependency
 RUN apt-get update
