@@ -35,22 +35,3 @@ def algorithms_list_message(page_options: dict) -> (str, InlineKeyboardMarkup):
     markup.add(btn1, btn2, btn3)
 
     return message, markup
-
-
-def useful_links_list_message() -> str:
-    """
-    Returns a string containing a list of useful or commonly used links.
-    """
-    message = "Useful or commonly used links:\n\n"
-    links = {
-        "https://euangoddard.github.io/clipboard2markdown/": "HTML to Markdown converter",
-        "https://leetcode.com/": "online platform for coding interview preparation",
-        "https://coderun.yandex.ru/": "online platform where users can solve coding problems",
-        "https://www.codewars.com/": "educational community for computer programming",
-        "https://www.hackerrank.com/": "tech hiring platform serves as the standard for assessing developer skills",
-    }
-
-    for link, description in links.items():
-        message += f" - [link]({link}) : {description}\n\n"
-
-    return message
