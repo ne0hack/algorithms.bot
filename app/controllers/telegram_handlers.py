@@ -1,7 +1,7 @@
 from telebot import TeleBot
 
 from app.repositories import get_solved_algorithms, get_unsolved_algorithms
-from app.services import clear_chat, algorithms_list_message, start_page_message, useful_links_list_message
+from app.services import clear_chat, algorithms_list_message, start_page_message
 from app.config import TELEGRAM_BOT_TOKEN, ADMIN_ID, logger
 
 bot = TeleBot(TELEGRAM_BOT_TOKEN)
@@ -39,14 +39,6 @@ def update_algorithms(request):
             bot.send_message(request.from_user.id, error_message)
 
         bot.delete_message(request.from_user.id, request.message_id + 1)
-
-
-@bot.message_handler(commands=["links"])
-def links_page(request):
-    if int(request.from_user.id) == ADMIN_ID:
-        clear_chat(bot_conn=bot, chat_id=request.chat.id, message_id=request.message_id)
-        message = useful_links_list_message()
-        bot.send_message(request.from_user.id, message, parse_mode="Markdown", disable_web_page_preview=True)
 
 
 @bot.callback_query_handler(func=lambda call: True)
